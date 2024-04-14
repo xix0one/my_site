@@ -97,13 +97,15 @@
             if ($errors) { ?>
 
                 <ul>
-                    <?php foreach ($errors as $e) ?>
+                    <?php foreach ($errors as $e) { ?>
                         <li><?= $e ?></li>
+                    <?php } ?>
                 <ul>
 
             <?php } else {
                 $stmt->execute([$name, $age, $rank]);
                 header('Location: /db.php');
+                exit();
             }
 
 
@@ -117,21 +119,26 @@
 
         if (!empty($_POST['name'])) {
 
-            $name = htmlentities(trim($_POST['name']));
+            $name = trim($_POST['name']);
             if (iconv_strlen($name) <= 1) {
                 echo 'Введите корректное имя';
             } else {
 
-                $db->exec("DELETE FROM `heroes` WHERE `name` = '$name'");
+                $stmt = $db->prepare("DELETE FROM `heroes` WHERE `name` = ?");
+                foreach ($_POST['delete'] as $d) {
+                    $stmt->execute([$d]);
+                }
                 header('Location: /db.php');
-                
+                exit();
             }
         }
 
-        foreach ($_POST['delete'] as $d) {
-            $db->exec("DELETE FROM `heroes` WHERE `name` = '$d'");
+        if (!empty($_POST['delete'])) {
+            foreach ($_POST['delete'] as $d) {
+                $db->exec("DELETE FROM `heroes` WHERE `name` = '$d'");
                 header('Location: /db.php');
-        }
+            }
+        }  
         
     }
 
