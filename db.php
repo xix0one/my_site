@@ -142,10 +142,11 @@
         
     }
 
-    if (isset($_POST['down_csv'])) {
+    function download_type($type) {
+        global $db;
         ob_clean();
-        header('Content-type: text/csv');
-        header('Content-Disposition: attachment; filename="heroes.csv"');
+        header("Content-type: text/{$type}");
+        header('Content-Disposition: attachment; filename="heroes.' . $type . '"');
         $fh = fopen('php://output', 'wb');
         $heroes = $db->query('SELECT `name`, `age`, `rank` FROM `heroes`');
         while ($row = $heroes->fetch()) {
@@ -154,17 +155,12 @@
         fclose($fh);
         exit();
     }
+    
+    if (isset($_POST['down_csv'])) {
+        download_type('csv');
+    }
 
     if (isset($_POST['down_txt'])) {
-        ob_clean();
-        header('Content-type: text/txt');
-        header('Content-Disposition: attachment; filename="heroes.txt"');
-        $fh = fopen('php://output', 'wb');
-        $heroes = $db->query('SELECT `name`, `age`, `rank` FROM `heroes`');
-        while ($row = $heroes->fetch()) {
-            fputcsv($fh, $row);
-        }
-        fclose($fh);
-        exit();
+        download_type('txt');
     }
 ?>
